@@ -1,0 +1,120 @@
+import { useState, useEffect, useCallback } from "react";
+import { getCart, addToCart, updateCartItem, removeCartItem } from "../services/cartService";
+import { CartItem } from "../types";
+import { useAuth } from "../services/AuthContext";
+import { notifyItemAddedToCart } from "../services/notificationService";
+
+export function useCart() {
+  const { user } = useAuth();
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch cart items
+  const fetchCart = useCallback(async () => {
+    if (!user) {
+      setItems([]);
+      setError(null);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const cartData = await getCart();
+      setItems(cartData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to load cart";
+      setError(errorMessage);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Add item to cart
+  const addItem = useCallback(async (productId: number, quantity: number = 1, productName?: string) => {
+    if (!user) {
+      const error = new Error('You must be logged in to add items to cart');
+      setError(error.message);
+      throw error;
+    }
+    try {
+      setError(null);
+      const newItem = await addToCart(productId, quantity);
+      setItems((prev) => [...prev, newItem]);
+      
+      // Show notification when item is added
+      if (productName) {
+        await notifyItemAddedToCart(productName);
+      } else {
+        // Try to get product name from items if available
+        await notifyItemAddedToCart(`Product #${productId}`);
+      }
+      
+      return newItem;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to add item to cart";
+      setError(errorMessage);
+      throw err;
+    }
+  }, [user]);
+
+  // Update item quantity
+  const updateItem = useCallback(async (itemId: number, quantity: number) => {
+    try {
+      setError(null);
+      const updatedItem = await updateCartItem(itemId, quantity);
+      setItems((prev) =>
+        prev.map((item) => (item.id === itemId ? updatedItem : item))
+      );
+      return updatedItem;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update item";
+      setError(errorMessage);
+      throw err;
+    }
+  }, []);
+
+  // Remove item from cart
+  const removeItem = useCallback(async (itemId: number) => {
+    try {
+      setError(null);
+      const item = items.find((i) => i.id === itemId);
+      if (!item) {
+        throw new Error('Item not found in cart');
+      }
+      await removeCartItem(item.product_id);
+      setItems((prev) => prev.filter((item) => item.id !== itemId));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to remove item";
+      setError(errorMessage);
+      throw err;
+    }
+  }, [items]);
+
+  // Calculate total
+  const total = items.reduce((sum, item) => {
+    const itemPrice = item.price || 0;
+    return sum + itemPrice * (item.quantity || 1);
+  }, 0);
+
+  // Calculate item count
+  const itemCount = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+  // Load cart on mount and when user changes
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart, user]);
+
+  return {
+    items,
+    loading,
+    error,
+    total,
+    itemCount,
+    addItem,
+    updateItem,
+    removeItem,
+    refreshCart: fetchCart,
+  };
+}

@@ -1,0 +1,22 @@
+body{
+    width: fit-content;
+    height: fit-content;
+}
+img{
+    width: auto;
+    height: 12em;
+}
+.card{
+    width: fit-content;
+    text-align: center;
+    border: 1px black solid;
+    border-radius: 1em;
+    padding: 1em;
+}
+.text {
+    width: 16em;
+    margin: 0 auto;
+    text-align: center;
+    max-height: 72px;
+    overflow: hidden;
+}
