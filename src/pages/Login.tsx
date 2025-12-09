@@ -3,12 +3,14 @@ import ErrorBox from "../components/ErrorBox";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase";
 import { Link, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ function Login() {
         e.preventDefault();
 
         if (!email || !password) {
-            setError("Please fill out the fields");
+            setError(t('login.errors.fillFields'));
             return;
         }
 
@@ -43,13 +45,13 @@ function Login() {
             style={{ width: "100%", height: "90vh", paddingTop: "15vh" }}
         >
             <form className="card shadow m-auto border-0 w-25" onSubmit={login}>
-                <h3 className="card-title m-4">Log in</h3>
+                <h3 className="card-title m-4">{t('login.title')}</h3>
 
                 <div className="card-body">
                     <input
                         className="form-control my-2"
                         type="email"
-                        placeholder="Email"
+                        placeholder={t('login.placeholders.email')}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -57,7 +59,7 @@ function Login() {
                     <input
                         className="form-control my-2"
                         type="password"
-                        placeholder="Password"
+                        placeholder={t('login.placeholders.password')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
@@ -66,7 +68,7 @@ function Login() {
 
                     {loading && (
                         <p className="text-center text-secondary mt-2">
-                            Logging in...
+                            {t('login.loading')}
                         </p>
                     )}
                 </div>
@@ -77,7 +79,7 @@ function Login() {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? "Please wait..." : "Log In"}
+                        {loading ? t('login.pleaseWait') : t('login.button')}
                     </button>
 
                     <Link
@@ -85,7 +87,7 @@ function Login() {
                         className="btn btn-primary m-auto mt-3"
                         style={{ width: "60%" }}
                     >
-                        Want to sign up?
+                        {t('login.switch')}
                     </Link>
                 </div>
             </form>

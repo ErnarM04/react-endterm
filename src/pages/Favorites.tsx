@@ -7,12 +7,14 @@ import { fetchFavorites, removeFavorite } from '../features/favorites/favoritesS
 import ProductCard from './ProductCard';
 import ErrorBox from '../components/ErrorBox';
 import Spinner from '../components/Spinner';
+import { useTranslation } from 'react-i18next';
 
 function Favorites() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading, error } = useSelector((state: RootState) => state.favorites);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user) {
@@ -38,10 +40,10 @@ function Favorites() {
     <div className="container my-5">
       <div className="row mb-4">
         <div className="col">
-          <h1 className="mb-3">My Favorites</h1>
+          <h1 className="mb-3">{t('favorites.title')}</h1>
           {!user && (
             <p className="text-muted">
-              Your favorites are saved locally. <a href="/login">Login</a> to sync them across devices.
+              {t('favorites.syncHint')} <a href="/login">{t('nav.login')}</a>
             </p>
           )}
         </div>
@@ -51,10 +53,10 @@ function Favorites() {
 
       {products.length === 0 ? (
         <div className="text-center py-5">
-          <h3>No favorites yet</h3>
-          <p className="text-muted mb-4">Start adding products to your favorites!</p>
+          <h3>{t('favorites.emptyTitle')}</h3>
+          <p className="text-muted mb-4">{t('favorites.emptySubtitle')}</p>
           <button className="btn btn-primary" onClick={() => navigate('/products')}>
-            Browse Products
+            {t('favorites.browse')}
           </button>
         </div>
       ) : (
@@ -66,7 +68,7 @@ function Favorites() {
                 className="btn btn-danger btn-sm position-absolute"
                 style={{ top: '10px', right: '10px', zIndex: 10 }}
                 onClick={() => handleRemove(product.id)}
-                title="Remove from favorites"
+                title={t('favorites.removeTitle')}
               >
                 ❌
               </button>

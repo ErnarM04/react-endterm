@@ -8,6 +8,7 @@ import {RootState, AppDispatch} from "../services/store";
 import { useAuth } from "../services/AuthContext";
 import { addFavorite, removeFavorite, checkFavoriteStatus } from "../features/favorites/favoritesSlice";
 import { useCart } from "../hooks/useCart";
+import { useTranslation } from "react-i18next";
 
 // Lazy Image Component with IntersectionObserver
 function LazyImage({ 
@@ -30,6 +31,7 @@ function LazyImage({
     const [hasError, setHasError] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (!containerRef.current || isInView) return;
@@ -101,7 +103,7 @@ function LazyImage({
             )}
             {hasError && (
                 <div className="bg-light d-flex align-items-center justify-content-center" style={{ width: '100%', minHeight: '200px' }}>
-                    <span className="text-muted">Failed to load image</span>
+                    <span className="text-muted">{t('products.failedImage')}</span>
                 </div>
             )}
         </div>
@@ -118,6 +120,7 @@ const ImageGallery = React.memo(({
     selectedImage: string | null; 
     onImageSelect: (src: string) => void;
 }) => {
+    const { t } = useTranslation();
     return (
         <div>
             <LazyImage
@@ -131,7 +134,7 @@ const ImageGallery = React.memo(({
                     <LazyImage
                         key={index}
                         src={imgSrc}
-                        alt={`Thumbnail ${index}`}
+                        alt={t('products.thumbnails', { index })}
                         className="thumbnail rounded"
                         onClick={() => onImageSelect(imgSrc)}
                         style={{
@@ -160,6 +163,7 @@ export default function ItemDetails() {
         selectedItem ? (state.favorites.favoriteStatuses[selectedItem.id] || false) : false
     );
     const dispatch = useDispatch<AppDispatch>();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (id) {
@@ -191,13 +195,13 @@ export default function ItemDetails() {
 
     if (errorItem) return <ErrorBox message={errorItem} />;
 
-    if (!selectedItem) return <ErrorBox message={"Product not found"} />;
+    if (!selectedItem) return <ErrorBox message={t('products.notFound')} />;
 
     return (
         <div className="container mt-4">
 
             <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
-                {"<- Back"}
+                {t('products.back')}
             </button>
 
             <div className="row">
@@ -224,7 +228,7 @@ export default function ItemDetails() {
                                     dispatch(addFavorite({ userId: user?.uid || null, productId: selectedItem.id }));
                                 }
                             }}
-                            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                            title={isFavorite ? t('products.removeFavorite') : t('products.addFavorite')}
                         >
                             {isFavorite ? '❤️' : '🤍'}
                         </button>
@@ -232,10 +236,10 @@ export default function ItemDetails() {
                     <h5 className="text-success">{selectedItem.price}$</h5>
                     <p>{selectedItem.description}</p>
 
-                    <p><b>Category:</b> {selectedItem.category}</p>
-                    <p><b>Brand:</b> {selectedItem.brand}</p>
-                    <p><b>Stock:</b> {selectedItem.stock}</p>
-                    <p><b>Rating:</b> {selectedItem.rating}</p>
+                    <p><b>{t('products.category')}:</b> {selectedItem.category}</p>
+                    <p><b>{t('products.brand')}:</b> {selectedItem.brand}</p>
+                    <p><b>{t('products.stock')}:</b> {selectedItem.stock}</p>
+                    <p><b>{t('products.rating')}:</b> {selectedItem.rating}</p>
                     
                     <div className="mt-4">
                         {cartError && <ErrorBox message={cartError} />}
@@ -259,10 +263,10 @@ export default function ItemDetails() {
                             }}
                         >
                             {!user 
-                                ? 'Log in to Add to Cart' 
+                                ? t('products.loginToAdd') 
                                 : addingToCart 
-                                    ? 'Adding...' 
-                                    : 'Add to Cart'
+                                    ? t('products.adding') 
+                                    : t('products.addToCart')
                             }
                         </button>
                     </div>

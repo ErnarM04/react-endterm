@@ -1,9 +1,11 @@
 import Spinner from 'react-bootstrap/Spinner';
+import { useTranslation } from 'react-i18next';
 
 function LoadingSpinner() {
+    const { t } = useTranslation();
     return (
         <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('spinner.loading')}</span>
         </Spinner>
     );
 }

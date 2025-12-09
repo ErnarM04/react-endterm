@@ -2,13 +2,14 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
 import {useAuth} from "../services/AuthContext";
-import {signOut} from "firebase/auth";
-import {auth} from "../services/firebase";
+import { signOut } from "firebase/auth";
+import { auth } from "../services/firebase";
+import { useTranslation } from "react-i18next";
 
 function Header() {
     const location = useLocation();
     const navigate = useNavigate();
-
+    const { t } = useTranslation();
     const { user } = useAuth();
 
     function handleLogout() {
@@ -23,7 +24,7 @@ function Header() {
         <Navbar expand="lg" bg="dark" variant="dark" className="shadow-sm sticky-top" style={{ height: "10vh" }} >
             <Container fluid className="px-5">
                 <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-light">
-                    FakeStore
+                    {t('brand')}
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbarScroll" />
                 <Navbar.Collapse id="navbarScroll">
@@ -36,7 +37,7 @@ function Header() {
                             to="/"
                             className={location.pathname === "/" ? "active fw-semibold" : ""}
                         >
-                            Home
+                            {t('nav.home')}
                         </Nav.Link>
 
                         <Nav.Link
@@ -44,7 +45,7 @@ function Header() {
                             to="/products"
                             className={location.pathname === "/products" ? "active fw-semibold" : ""}
                         >
-                            Products
+                            {t('nav.products')}
                         </Nav.Link>
 
                         <Nav.Link
@@ -53,14 +54,14 @@ function Header() {
                             className={location.pathname === "/cart" ? "active fw-semibold" : ""}
                             style={!user ? { opacity: 0.6 } : {}}
                         >
-                            Cart {!user && '(Login Required)'}
+                            {t('nav.cart')} {!user && `(${t('nav.cartLoginRequired')})`}
                         </Nav.Link>
                         <Nav.Link
                             as={Link}
                             to="/favorites"
                             className={location.pathname === "/favorites" ? "active fw-semibold" : ""}
                         >
-                            Favorites
+                            {t('nav.favorites')}
                         </Nav.Link>
                     </Nav>
 
@@ -68,19 +69,19 @@ function Header() {
                         {user ? (
                             <>
                                 <Button as={Link as any} to="/profile" variant="outline-light" className="rounded-pill px-3">
-                                    Profile
+                                    {t('nav.profile')}
                                 </Button>
                                 <Button onClick={handleLogout} variant="outline-light" className="rounded-pill px-3">
-                                    Logout
+                                    {t('nav.logout')}
                                 </Button>
                             </>
                         ) : (
                             <>
                                 <Button as={Link as any} to="/login" variant="outline-light" className="rounded-pill px-3">
-                                    Login
+                                    {t('nav.login')}
                                 </Button>
                                 <Button as={Link as any} to="/signup" variant="outline-light" className="rounded-pill px-3">
-                                    Signup
+                                    {t('nav.signup')}
                                 </Button>
                             </>
                         )}

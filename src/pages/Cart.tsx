@@ -8,6 +8,7 @@ import { getProductById, Product } from '../services/ItemsService';
 import { CartItem } from '../types';
 import { useAuth } from '../services/AuthContext';
 import { notifyCheckout } from '../services/notificationService';
+import { useTranslation } from 'react-i18next';
 
 function Cart(): React.JSX.Element {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function Cart(): React.JSX.Element {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (authLoading) {
@@ -125,7 +127,7 @@ function Cart(): React.JSX.Element {
     await notifyCheckout(total, itemCount);
     
     // Proceed with checkout (you can add actual checkout logic here)
-    alert(`Proceeding to checkout with ${itemCount} item${itemCount > 1 ? 's' : ''} (Total: $${total.toFixed(2)})`);
+    alert(t('cart.checkoutAlert', { count: itemCount, plural: itemCount > 1 ? 's' : '', total: total.toFixed(2) }));
   };
 
   if (authLoading || loading) {
@@ -137,14 +139,14 @@ function Cart(): React.JSX.Element {
       <div className="container my-5">
         <div className="row">
           <div className="col text-center py-5">
-            <h2>Please Log In</h2>
-            <p className="text-muted mb-4">You must be logged in to view your cart.</p>
+            <h2>{t('cart.loginTitle')}</h2>
+            <p className="text-muted mb-4">{t('cart.loginSubtitle')}</p>
             <div className="d-flex gap-2 justify-content-center">
               <button className="btn btn-primary" onClick={() => navigate('/login')}>
-                Log In
+                {t('cart.login')}
               </button>
               <button className="btn btn-outline-primary" onClick={() => navigate('/signup')}>
-                Sign Up
+                {t('cart.signup')}
               </button>
             </div>
           </div>
@@ -158,10 +160,10 @@ function Cart(): React.JSX.Element {
       <div className="container my-5">
         <div className="row">
           <div className="col text-center py-5">
-            <h2>Your cart is empty</h2>
-            <p className="text-muted mb-4">Add some products to get started!</p>
+            <h2>{t('cart.emptyTitle')}</h2>
+            <p className="text-muted mb-4">{t('cart.emptySubtitle')}</p>
             <button className="btn btn-primary" onClick={() => navigate('/products')}>
-              Browse Products
+              {t('cart.browse')}
             </button>
           </div>
         </div>
@@ -173,7 +175,7 @@ function Cart(): React.JSX.Element {
     <div className="container my-5">
       <div className="row">
         <div className="col">
-          <h1 className="mb-4">Shopping Cart</h1>
+          <h1 className="mb-4">{t('cart.title')}</h1>
         </div>
       </div>
 
@@ -193,33 +195,33 @@ function Cart(): React.JSX.Element {
         <div className="col-md-4">
           <div className="card sticky-top" style={{ top: '100px' }}>
             <div className="card-header">
-              <h4>Order Summary</h4>
+              <h4>{t('cart.summary')}</h4>
             </div>
             <div className="card-body">
               <div className="d-flex justify-content-between mb-2">
-                <span>Subtotal:</span>
+                <span>{t('cart.subtotal')}</span>
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="d-flex justify-content-between mb-2">
-                <span>Tax (10%):</span>
+                <span>{t('cart.tax')}</span>
                 <span>${calculateTax().toFixed(2)}</span>
               </div>
               <hr />
               <div className="d-flex justify-content-between mb-4">
-                <strong>Total:</strong>
+                <strong>{t('cart.total')}</strong>
                 <strong className="fs-5">${calculateTotal().toFixed(2)}</strong>
               </div>
               <button
                 className="btn btn-primary btn-lg w-100"
                 onClick={handleCheckout}
               >
-                Proceed to Checkout
+                {t('cart.checkout')}
               </button>
               <button
                 className="btn btn-outline-secondary w-100 mt-2"
                 onClick={() => navigate('/products')}
               >
-                Continue Shopping
+                {t('cart.continue')}
               </button>
             </div>
           </div>

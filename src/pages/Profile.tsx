@@ -9,6 +9,7 @@ import { compressImage } from "../utils/imageCompression";
 import ErrorBox from "../components/ErrorBox";
 import Spinner from "../components/Spinner";
 import NotificationPermission from "../components/NotificationPermission";
+import { useTranslation } from "react-i18next";
 
 function Profile() {
     const { user, auth } = useAuth();
@@ -17,6 +18,7 @@ function Profile() {
     const { photoURL, loading, uploading, error } = useSelector((state: RootState) => state.profile);
     const [validationError, setValidationError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (user) {
@@ -36,13 +38,13 @@ function Profile() {
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            setValidationError('Please select an image file');
+            setValidationError(t('profile.validation.imageType'));
             return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            setValidationError('Image size must be less than 5MB');
+            setValidationError(t('profile.validation.imageSize'));
             return;
         }
 
@@ -54,7 +56,7 @@ function Profile() {
             dispatch(uploadProfilePicture({ userId: user.uid, photoBase64: compressedBase64 }));
         } catch (err) {
             console.error('Error compressing image:', err);
-            setValidationError('Failed to process image. Please try again.');
+            setValidationError(t('profile.validation.processFailed'));
         } finally {
             // Reset file input
             if (fileInputRef.current) {
@@ -91,7 +93,7 @@ function Profile() {
             style={{ width: "100%", minHeight: "90vh" }}
         >
             <div className="card shadow border-0 p-4" style={{ width: "100%", maxWidth: "500px" }}>
-                <h3 className="card-title mb-4">Profile</h3>
+                <h3 className="card-title mb-4">{t('profile.title')}</h3>
 
                 {(error || validationError) && <ErrorBox message={error || validationError || ''} />}
 
@@ -143,7 +145,7 @@ function Profile() {
                             id="profile-picture-input"
                         />
                         <label htmlFor="profile-picture-input" className="btn btn-primary btn-sm me-2">
-                            {photoURL ? 'Change Photo' : 'Upload Photo'}
+                            {photoURL ? t('profile.changePhoto') : t('profile.uploadPhoto')}
                         </label>
                         {photoURL && (
                             <button
@@ -151,21 +153,21 @@ function Profile() {
                                 onClick={handleRemovePicture}
                                 disabled={uploading}
                             >
-                                Remove Photo
+                                {t('profile.removePhoto')}
                             </button>
                         )}
                     </div>
                 </div>
 
                 <div className="mb-3">
-                    <h5 className="text-muted mb-1">Email</h5>
+                    <h5 className="text-muted mb-1">{t('profile.email')}</h5>
                     <div className="bg-light border-0 p-2 rounded">
                         {user.email}
                     </div>
                 </div>
 
                 <div className="mb-4">
-                    <h5 className="text-muted mb-1">User ID</h5>
+                    <h5 className="text-muted mb-1">{t('profile.userId')}</h5>
                     <div className="bg-light border-0 p-2 rounded">
                         {user.uid}
                     </div>
@@ -181,7 +183,7 @@ function Profile() {
                     className="btn btn-danger m-auto w-50"
                     disabled={uploading}
                 >
-                    Log Out
+                    {t('profile.logout')}
                 </button>
             </div>
         </div>

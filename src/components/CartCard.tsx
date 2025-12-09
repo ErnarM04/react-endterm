@@ -1,5 +1,6 @@
 import React from 'react';
 import { CartItem } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface CartCardProps {
   item: CartItem;
@@ -8,6 +9,7 @@ interface CartCardProps {
 }
 
 function CartCard({ item, onQuantityChange, onRemove }: CartCardProps): React.JSX.Element {
+  const { t } = useTranslation();
   const handleIncrement = (): void => {
     onQuantityChange(item.id, item.quantity + 1);
   };
@@ -31,18 +33,18 @@ function CartCard({ item, onQuantityChange, onRemove }: CartCardProps): React.JS
           <div className="col-md-3">
             <img
               src={item.image || 'https://via.placeholder.com/150x150?text=No+Image'}
-              alt={item.name || 'Product'}
+              alt={item.name || t('cartCard.product')}
               className="img-fluid"
               style={{ height: '150px', objectFit: 'cover', borderRadius: '8px' }}
             />
           </div>
           <div className="col-md-5">
-            <h5 className="card-title">{item.name || 'Product Name'}</h5>
+            <h5 className="card-title">{item.name || t('cartCard.productName')}</h5>
             <p className="card-text text-muted">
-              {item.description || 'No description available'}
+              {item.description || t('cartCard.noDescription')}
             </p>
             <span className="badge bg-primary fs-6">
-              ${item.price?.toFixed(2) || '0.00'} each
+              ${item.price?.toFixed(2) || '0.00'} {t('cartCard.each')}
             </span>
           </div>
           <div className="col-md-2">
@@ -71,7 +73,7 @@ function CartCard({ item, onQuantityChange, onRemove }: CartCardProps): React.JS
               className="btn btn-danger btn-sm"
               onClick={handleRemove}
             >
-              Remove
+              {t('cartCard.remove')}
             </button>
           </div>
         </div>

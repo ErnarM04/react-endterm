@@ -8,10 +8,12 @@ import { useDebounce } from '../hooks/useDebounce';
 import { setQuery, setPage, fetchProductsByQuery } from "../features/items/itemsSlice";
 import ErrorBox from "../components/ErrorBox";
 import {RootState, AppDispatch} from "../services/store";
+import { useTranslation } from "react-i18next";
 
 function ProductsList() {
     const dispatch = useDispatch<AppDispatch>();
     const [searchParams, setSearchParams] = useSearchParams();
+    const { t } = useTranslation();
 
     // LOCAL STATE for INPUT
     const initialQuery = searchParams.get("q") || "";
@@ -72,7 +74,7 @@ function ProductsList() {
             <div className="d-flex justify-content-center mb-4">
                 <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={t('search.placeholder')}
                     value={localQuery}
                     onChange={(e) => setLocalQuery(e.target.value)}
                     className="form-control rounded-pill me-2"
@@ -82,7 +84,7 @@ function ProductsList() {
                     className="btn btn-outline-secondary rounded-pill"
                     onClick={clearFilter}
                 >
-                    Clear
+                    {t('search.clear')}
                 </button>
             </div>
 
@@ -113,7 +115,7 @@ function ProductsList() {
                                             onClick={() => handlePageChange(currentPage - 1)}
                                             disabled={currentPage === 1}
                                         >
-                                            Previous
+                                            {t('pagination.previous')}
                                         </button>
                                     </li>
 
@@ -151,7 +153,7 @@ function ProductsList() {
                                             onClick={() => handlePageChange(currentPage + 1)}
                                             disabled={currentPage === totalPages}
                                         >
-                                            Next
+                                            {t('pagination.next')}
                                         </button>
                                     </li>
                                 </ul>
@@ -160,11 +162,15 @@ function ProductsList() {
                     )}
 
                     <div className="text-center text-muted mb-3">
-                        Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, total)} of {total} products
+                        {t('pagination.showing', {
+                            from: ((currentPage - 1) * limit) + 1,
+                            to: Math.min(currentPage * limit, total),
+                            total
+                        })}
                     </div>
                 </>
             ) : (
-                <ErrorBox message={"No products found."} />
+                <ErrorBox message={t('products.empty')} />
             )}
         </div>
     );

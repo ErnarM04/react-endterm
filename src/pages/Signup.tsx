@@ -3,6 +3,7 @@ import ErrorBox from "../components/ErrorBox";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {auth} from "../services/firebase";
 import {Link, useNavigate} from "react-router";
+import { useTranslation } from "react-i18next";
 
 function Signup() {
     const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ function Signup() {
     const [error, setError] = useState("");
     const [confirm, setConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
 
@@ -29,13 +31,13 @@ function Signup() {
                         setLoading(false);
                     });
             } else {
-                setError("Please enter a password");
+                setError(t('signup.errors.passwordRequired'));
             }
         } else {
             if (password) {
-                setError("Please enter an email");
+                setError(t('signup.errors.emailRequired'));
             } else {
-                setError("Please fill out the fields");
+                setError(t('signup.errors.fillFields'));
             }
         }
     }
@@ -54,7 +56,7 @@ function Signup() {
             setError("");
         } else {
             setConfirm(false);
-            setError("Passwords don't match");
+            setError(t("signup.errors.passwordMismatch"));
         }
     }
 
@@ -67,18 +69,18 @@ function Signup() {
                     if (validatePassword(password)) {
                         register(e);
                     } else {
-                        setError("Invalid password")
+                        setError(t('signup.errors.invalidPassword'))
                     }
                 }
-                else setError("Invalid email");
+                else setError(t('signup.errors.invalidEmail'));
                 console.log(email, password);
             }}>
-                <h3 className="card-title m-4">Sign Up</h3>
+                <h3 className="card-title m-4">{t('signup.title')}</h3>
                 <div className="card-body">
                     <input
                         className="form-control my-2"
                         type="email"
-                        placeholder="Email"
+                        placeholder={t('signup.placeholders.email')}
                         name="email"
                         value={email}
                         onChange={(e) => {
@@ -87,7 +89,7 @@ function Signup() {
                     <input
                         className="form-control my-2"
                         type="password"
-                        placeholder="Password"
+                        placeholder={t('signup.placeholders.password')}
                         name="password"
                         value={password}
                         onChange={(e) => {
@@ -96,14 +98,14 @@ function Signup() {
                     <input
                         className="form-control my-2"
                         type="password"
-                        placeholder="Confirm Password"
+                        placeholder={t('signup.placeholders.confirm')}
                         name="confirm-password"
                         onChange={(e) => checkPassword(e)}/>
                     {error ? <ErrorBox message={error} />: null}
 
                     {loading && (
                         <p className="text-center text-secondary mt-2">
-                            Creating account...
+                            {t('signup.loading')}
                         </p>
                     )}
                 </div>
@@ -112,12 +114,12 @@ function Signup() {
                         className="btn btn-primary btn-success w-75 m-auto mt-2"
                         type="submit"
                         disabled={loading}>
-                        {loading ? "Please wait..." : "Sign Up"}
+                        {loading ? t('signup.pleaseWait') : t('signup.button')}
                     </button>
                     <Link to="/login"
                           className="btn btn-primary m-auto mt-3 "
                           style={{ width: "fit-content" }}>
-                        Already have an account?
+                        {t('signup.switch')}
                     </Link>
                 </div>
 

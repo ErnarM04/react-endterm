@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 // Notification Service for local push notifications
 
 export interface NotificationOptions {
@@ -88,8 +89,8 @@ export async function showNotification(options: NotificationOptions): Promise<vo
 // Show notification when item added to cart
 export async function notifyItemAddedToCart(productName: string): Promise<void> {
   await showNotification({
-    title: 'Item Added to Cart',
-    body: `${productName} has been added to your cart`,
+    title: i18n.t('notifications.service.itemAddedTitle'),
+    body: i18n.t('notifications.service.itemAddedBody', { name: productName }),
     tag: 'cart-add',
     icon: '/logo192.png',
     data: {
@@ -101,9 +102,12 @@ export async function notifyItemAddedToCart(productName: string): Promise<void> 
 
 // Show notification when checkout is initiated
 export async function notifyCheckout(cartTotal: number, itemCount: number): Promise<void> {
+  const plural = i18n.language.startsWith('ru')
+    ? (itemCount > 1 ? (itemCount >= 2 && itemCount <= 4 ? 'а' : 'ов') : '')
+    : (itemCount > 1 ? 's' : '');
   await showNotification({
-    title: 'Proceeding to Checkout',
-    body: `Your order of ${itemCount} item${itemCount > 1 ? 's' : ''} ($${cartTotal.toFixed(2)}) is being processed`,
+    title: i18n.t('notifications.service.checkoutTitle'),
+    body: i18n.t('notifications.service.checkoutBody', { count: itemCount, total: cartTotal.toFixed(2), plural }),
     tag: 'checkout',
     icon: '/logo192.png',
     requireInteraction: true,
@@ -119,8 +123,8 @@ export async function notifyCheckout(cartTotal: number, itemCount: number): Prom
 // Show notification when cart is empty
 export async function notifyCartEmpty(): Promise<void> {
   await showNotification({
-    title: 'Cart is Empty',
-    body: 'Add some items to your cart to get started!',
+    title: i18n.t('notifications.service.emptyTitle'),
+    body: i18n.t('notifications.service.emptyBody'),
     tag: 'cart-empty',
     icon: '/logo192.png',
   });

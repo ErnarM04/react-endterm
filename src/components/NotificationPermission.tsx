@@ -4,6 +4,7 @@ import {
   getNotificationPermission, 
   requestNotificationPermission 
 } from '../services/notificationService';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationPermissionProps {
   showAsBanner?: boolean;
@@ -13,6 +14,7 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isRequesting, setIsRequesting] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsSupported(isNotificationSupported());
@@ -29,8 +31,8 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
         // Show a test notification
         if ('serviceWorker' in navigator) {
           const registration = await navigator.serviceWorker.ready;
-          await registration.showNotification('Notifications Enabled!', {
-            body: 'You will now receive notifications for cart updates.',
+          await registration.showNotification(t('notifications.toast.enabledTitle'), {
+            body: t('notifications.toast.enabledBody'),
             icon: '/logo192.png',
             tag: 'permission-granted',
           });
@@ -55,7 +57,7 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
             <use href="#check-circle-fill"/>
           </svg>
           <div>
-            <strong>Notifications enabled!</strong> You'll receive updates about your cart.
+            <strong>{t('notifications.bannerEnabled.title')}</strong> {t('notifications.bannerEnabled.body')}
           </div>
         </div>
       );
@@ -63,9 +65,9 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
     return (
       <div className="card mb-3">
         <div className="card-body">
-          <h6 className="card-title">🔔 Notifications</h6>
+          <h6 className="card-title">{t('notifications.enabled.title')}</h6>
           <p className="card-text text-success mb-0">
-            <strong>Enabled</strong> - You'll receive notifications for cart updates.
+            <strong>{t('notifications.enabled.status')}</strong>
           </p>
         </div>
       </div>
@@ -76,12 +78,12 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
     return (
       <div className="card mb-3 border-warning">
         <div className="card-body">
-          <h6 className="card-title">🔔 Notifications</h6>
+          <h6 className="card-title">{t('notifications.denied.title')}</h6>
           <p className="card-text text-muted mb-2">
-            Notifications are blocked. Please enable them in your browser settings to receive cart updates.
+            {t('notifications.denied.body')}
           </p>
           <small className="text-muted">
-            Go to your browser settings → Site settings → Notifications → Allow
+            {t('notifications.denied.hint')}
           </small>
         </div>
       </div>
@@ -93,14 +95,14 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
     return (
       <div className="alert alert-info d-flex align-items-center justify-content-between mb-3" role="alert">
         <div>
-          <strong>Enable notifications</strong> to get updates when items are added to your cart.
+          <strong>{t('notifications.prompt.title')}</strong> {t('notifications.prompt.body')}
         </div>
         <button
           className="btn btn-sm btn-primary"
           onClick={handleRequestPermission}
           disabled={isRequesting}
         >
-          {isRequesting ? 'Requesting...' : 'Enable'}
+          {isRequesting ? t('notifications.prompt.requesting') : t('notifications.prompt.action')}
         </button>
       </div>
     );
@@ -109,16 +111,16 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
   return (
     <div className="card mb-3 border-primary">
       <div className="card-body">
-        <h6 className="card-title">🔔 Enable Notifications</h6>
+        <h6 className="card-title">{t('notifications.card.title')}</h6>
         <p className="card-text mb-3">
-          Get notified when items are added to your cart or when you proceed to checkout.
+          {t('notifications.card.body')}
         </p>
         <button
           className="btn btn-primary"
           onClick={handleRequestPermission}
           disabled={isRequesting}
         >
-          {isRequesting ? 'Requesting Permission...' : 'Enable Notifications'}
+          {isRequesting ? t('notifications.card.requesting') : t('notifications.card.action')}
         </button>
       </div>
     </div>

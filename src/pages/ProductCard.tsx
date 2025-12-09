@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../services/store';
 import { addFavorite, removeFavorite, checkFavoriteStatus } from '../features/favorites/favoritesSlice';
 import { ImageSkeleton } from '../components/Spinner';
+import { useTranslation } from "react-i18next";
 
 interface Product {
     id: number;
@@ -28,6 +29,7 @@ function ProductCard({ product }: ProductCardProps) {
     const [isInView, setIsInView] = useState(false);
     const [hasError, setHasError] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch(checkFavoriteStatus({ userId: user?.uid || null, productId: product.id }));
@@ -93,7 +95,7 @@ function ProductCard({ product }: ProductCardProps) {
                 className="btn btn-sm position-absolute"
                 style={{ top: '10px', right: '10px', zIndex: 10, backgroundColor: 'rgba(255,255,255,0.8)' }}
                 onClick={handleFavoriteToggle}
-                title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                title={isFavorite ? t('products.removeFavorite') : t('products.addFavorite')}
             >
                 {isFavorite ? '❤️' : '🤍'}
             </button>
@@ -127,7 +129,7 @@ function ProductCard({ product }: ProductCardProps) {
                     )}
                     {hasError && (
                         <div className="bg-light d-flex align-items-center justify-content-center" style={{ height: '200px', position: 'relative', zIndex: 2 }}>
-                            <span className="text-muted small">Image unavailable</span>
+                            <span className="text-muted small">{t('products.failedImage')}</span>
                         </div>
                     )}
                 </div>
