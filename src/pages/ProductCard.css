@@ -6,12 +6,25 @@ img{
     width: auto;
     height: 12em;
 }
-.card{
+.item{
     width: fit-content;
+    height: 80vh;
     text-align: center;
-    border: 1px black solid;
     border-radius: 1em;
     padding: 1em;
+}
+.item:hover{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+}
+.card{
+    align-items: center;
+    text-align: center;
+}
+.favorite-button:hover {
+    border: 1px black solid;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
 }
 .text {
     width: 16em;

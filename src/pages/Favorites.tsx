@@ -55,23 +55,16 @@ function Favorites() {
         <div className="text-center py-5">
           <h3>{t('favorites.emptyTitle')}</h3>
           <p className="text-muted mb-4">{t('favorites.emptySubtitle')}</p>
-          <button className="btn btn-primary" onClick={() => navigate('/products')}>
+          <button className="btn btn-primary" onClick={() => navigate('/products')}
+            style={{ backgroundColor: "#2A3A47", color: "#FFFFFF", border: 0 }}>
             {t('favorites.browse')}
           </button>
         </div>
       ) : (
         <div className="d-flex flex-wrap gap-4 justify-content-center">
           {products.map((product) => (
-            <div key={product.id} className="position-relative" style={{ maxWidth: '20em' }}>
+            <div key={product.id} className="position-relative" style={{ width: '20em', height: '100%' }}>
               <ProductCard product={product} />
-              <button
-                className="btn btn-danger btn-sm position-absolute"
-                style={{ top: '10px', right: '10px', zIndex: 10 }}
-                onClick={() => handleRemove(product.id)}
-                title={t('favorites.removeTitle')}
-              >
-                ❌
-              </button>
             </div>
           ))}
         </div>

@@ -20,16 +20,14 @@ export const fetchFavorites = createAsyncThunk(
         return true;
       });
       
-      // Fetch product details for each favorite
       const productsWithDetails = await Promise.all(
         validFavorites.map(async (item) => {
           try {
-            const productId = item.product_id;
-            if (!productId) {
+            if (!item.product_id) {
               console.error('Item missing product_id:', item);
               return null;
             }
-            const product = await getProductById(productId.toString());
+            const product = await getProductById(item.product_id.toString());
             return product;
           } catch (err) {
             console.error(`Failed to fetch product ${item.product_id}:`, err);
@@ -125,7 +123,6 @@ const favoritesSlice = createSlice({
         state.products = action.payload.products;
         state.loading = false;
         state.error = null;
-        // Update favorite statuses
         action.payload.favorites.forEach((fav) => {
           state.favoriteStatuses[fav.product_id] = true;
         });

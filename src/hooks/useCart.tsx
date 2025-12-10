@@ -10,7 +10,6 @@ export function useCart() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch cart items
   const fetchCart = useCallback(async () => {
     if (!user) {
       setItems([]);
@@ -31,7 +30,6 @@ export function useCart() {
     }
   }, [user]);
 
-  // Add item to cart
   const addItem = useCallback(async (productId: number, quantity: number = 1, productName?: string) => {
     if (!user) {
       const error = new Error('You must be logged in to add items to cart');
@@ -43,11 +41,9 @@ export function useCart() {
       const newItem = await addToCart(productId, quantity);
       setItems((prev) => [...prev, newItem]);
       
-      // Show notification when item is added
       if (productName) {
         await notifyItemAddedToCart(productName);
       } else {
-        // Try to get product name from items if available
         await notifyItemAddedToCart(`Product #${productId}`);
       }
       
@@ -59,7 +55,6 @@ export function useCart() {
     }
   }, [user]);
 
-  // Update item quantity
   const updateItem = useCallback(async (itemId: number, quantity: number) => {
     try {
       setError(null);
@@ -75,7 +70,6 @@ export function useCart() {
     }
   }, []);
 
-  // Remove item from cart
   const removeItem = useCallback(async (itemId: number) => {
     try {
       setError(null);
@@ -92,16 +86,13 @@ export function useCart() {
     }
   }, [items]);
 
-  // Calculate total
   const total = items.reduce((sum, item) => {
     const itemPrice = item.price || 0;
     return sum + itemPrice * (item.quantity || 1);
   }, 0);
 
-  // Calculate item count
   const itemCount = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-  // Load cart on mount and when user changes
   useEffect(() => {
     fetchCart();
   }, [fetchCart, user]);

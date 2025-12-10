@@ -21,7 +21,7 @@ function Header() {
     }
 
     return (
-        <Navbar expand="lg" bg="dark" variant="dark" className="shadow-sm sticky-top" style={{ height: "10vh" }} >
+        <Navbar expand="lg" className="shadow-sm sticky-top" style={{ height: "10vh", backgroundColor: "#2A3A47" }} >
             <Container fluid className="px-5">
                 <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-light">
                     {t('brand')}
@@ -36,6 +36,7 @@ function Header() {
                             as={Link}
                             to="/"
                             className={location.pathname === "/" ? "active fw-semibold" : ""}
+                            style={location.pathname === "/" ? { color: "#93A4B7" } : { color: "#FFFFFF" }}
                         >
                             {t('nav.home')}
                         </Nav.Link>
@@ -44,6 +45,7 @@ function Header() {
                             as={Link}
                             to="/products"
                             className={location.pathname === "/products" ? "active fw-semibold" : ""}
+                            style={location.pathname === "/products" ? { color: "#93A4B7" } : { color: "#FFFFFF" }}
                         >
                             {t('nav.products')}
                         </Nav.Link>
@@ -52,7 +54,12 @@ function Header() {
                             as={Link}
                             to={user ? "/cart" : "/login"}
                             className={location.pathname === "/cart" ? "active fw-semibold" : ""}
-                            style={!user ? { opacity: 0.6 } : {}}
+                            style={{
+                                opacity: !user ? 0.6 : 1,
+                                color: location.pathname === "/cart" ? "#93A4B7" : "#FFFFFF"
+                              }}
+                              
+
                         >
                             {t('nav.cart')} {!user && `(${t('nav.cartLoginRequired')})`}
                         </Nav.Link>
@@ -60,6 +67,8 @@ function Header() {
                             as={Link}
                             to="/favorites"
                             className={location.pathname === "/favorites" ? "active fw-semibold" : ""}
+                            style={location.pathname === "/favorites" ? { color: "#93A4B7" } : { color: "#FFFFFF" }}
+
                         >
                             {t('nav.favorites')}
                         </Nav.Link>

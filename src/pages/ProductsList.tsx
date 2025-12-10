@@ -98,7 +98,7 @@ function ProductsList() {
                 <>
                     <div className="d-flex flex-wrap gap-4 justify-content-center">
                         {list.map(product => (
-                            <div key={product.id} className="flex-shrink-0" style={{ maxWidth: "20em" }}>
+                            <div key={product.id} style={{ width: "20em", height: "100%" }}>
                                 <ProductCard product={product} />
                             </div>
                         ))}
@@ -113,6 +113,7 @@ function ProductsList() {
                                         <button
                                             className="page-link"
                                             onClick={() => handlePageChange(currentPage - 1)}
+                                            style={{ color: "#1F2A32" }}
                                             disabled={currentPage === 1}
                                         >
                                             {t('pagination.previous')}
@@ -131,6 +132,10 @@ function ProductsList() {
                                                 >
                                                     <button
                                                         className="page-link"
+                                                        style={{ backgroundColor: currentPage === pageNum ? "#2A3A47" : "#FFFFFF",
+                                                            color: currentPage === pageNum ? "#ffffff" : "#1F2A32",
+                                                            border: 0
+                                                         }}
                                                         onClick={() => handlePageChange(pageNum)}
                                                     >
                                                         {pageNum}
@@ -151,6 +156,7 @@ function ProductsList() {
                                         <button
                                             className="page-link"
                                             onClick={() => handlePageChange(currentPage + 1)}
+                                            style={{ color: "#1F2A32" }}
                                             disabled={currentPage === totalPages}
                                         >
                                             {t('pagination.next')}

@@ -48,7 +48,7 @@ function App() {
                         <ErrorBox message={t('offline')} style={{ position: 'sticky', top: 0, zIndex: 1050 }}/>
                     )}
                     <Header />
-                    <main className="flex-fill">
+                    <main className="flex-fill" style={{ backgroundColor: "#F5F6F7" }}>
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/products" element={<ProductsList />} />

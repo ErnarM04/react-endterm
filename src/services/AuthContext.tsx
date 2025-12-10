@@ -5,7 +5,7 @@ import { syncLocalStorageToAPI } from "./favoritesService";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./store";
 import { fetchFavorites, clearFavorites } from "../features/favorites/favoritesSlice";
-import { fetchProfile, clearProfile } from "../features/profile/profileSlice";
+import { fetchCart, clearCart } from "../features/cart/cartSlice";
 
 interface AuthContextType {
     user: User | null;
@@ -37,9 +37,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             if (currentUser && currentUser.uid !== prevUserIdRef.current) {
                 try {
                     await syncLocalStorageToAPI(currentUser.uid);
-                    // Fetch favorites and profile after sync
+                    // Fetch favorites and cart after sync
                     dispatch(fetchFavorites(currentUser.uid));
-                    dispatch(fetchProfile(currentUser.uid));
+                    dispatch(fetchCart());
                 } catch (error) {
                     console.error('Error syncing favorites on login:', error);
                 }
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 prevUserIdRef.current = null;
                 // Clear Redux state when user logs out
                 dispatch(clearFavorites());
-                dispatch(clearProfile());
+                dispatch(clearCart());
             }
             setUser(currentUser || null);
             setLoading(false);

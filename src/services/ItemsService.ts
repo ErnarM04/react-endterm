@@ -3,9 +3,12 @@ const URL = "https://fastapi-endterm.onrender.com/products";
 export interface Product {
     id: number;
     name: string;
+    name_ru?: string;
     price: number;
     description: string;
+    description_ru?: string;
     category: string;
+    category_ru?: string;
     brand: string;
     stock: number;
     rating: number;

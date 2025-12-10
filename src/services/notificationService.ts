@@ -1,5 +1,4 @@
 import i18n from '../i18n';
-// Notification Service for local push notifications
 
 export interface NotificationOptions {
   title: string;
@@ -11,12 +10,10 @@ export interface NotificationOptions {
   requireInteraction?: boolean;
 }
 
-// Check if notifications are supported
 export function isNotificationSupported(): boolean {
   return 'Notification' in window && 'serviceWorker' in navigator;
 }
 
-// Request notification permission
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!isNotificationSupported()) {
     return 'denied';
@@ -30,7 +27,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   return Notification.permission;
 }
 
-// Get current notification permission status
 export function getNotificationPermission(): NotificationPermission {
   if (!isNotificationSupported()) {
     return 'denied';
@@ -38,7 +34,6 @@ export function getNotificationPermission(): NotificationPermission {
   return Notification.permission;
 }
 
-// Show a local notification
 export async function showNotification(options: NotificationOptions): Promise<void> {
   if (!isNotificationSupported()) {
     console.warn('Notifications are not supported in this browser');
@@ -52,7 +47,6 @@ export async function showNotification(options: NotificationOptions): Promise<vo
     return;
   }
 
-  // Check if service worker is ready
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.ready;
@@ -67,7 +61,6 @@ export async function showNotification(options: NotificationOptions): Promise<vo
       });
     } catch (error) {
       console.error('Error showing notification:', error);
-      // Fallback to browser notification if service worker fails
       new Notification(options.title, {
         body: options.body,
         icon: options.icon || '/logo192.png',
@@ -76,7 +69,6 @@ export async function showNotification(options: NotificationOptions): Promise<vo
       });
     }
   } else {
-    // Fallback to browser notification
     new Notification(options.title, {
       body: options.body,
       icon: options.icon || '/logo192.png',
@@ -86,7 +78,6 @@ export async function showNotification(options: NotificationOptions): Promise<vo
   }
 }
 
-// Show notification when item added to cart
 export async function notifyItemAddedToCart(productName: string): Promise<void> {
   await showNotification({
     title: i18n.t('notifications.service.itemAddedTitle'),
@@ -100,7 +91,6 @@ export async function notifyItemAddedToCart(productName: string): Promise<void> 
   });
 }
 
-// Show notification when checkout is initiated
 export async function notifyCheckout(cartTotal: number, itemCount: number): Promise<void> {
   const plural = i18n.language.startsWith('ru')
     ? (itemCount > 1 ? (itemCount >= 2 && itemCount <= 4 ? 'а' : 'ов') : '')
@@ -120,7 +110,6 @@ export async function notifyCheckout(cartTotal: number, itemCount: number): Prom
   });
 }
 
-// Show notification when cart is empty
 export async function notifyCartEmpty(): Promise<void> {
   await showNotification({
     title: i18n.t('notifications.service.emptyTitle'),

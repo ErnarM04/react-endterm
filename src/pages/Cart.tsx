@@ -35,7 +35,6 @@ function Cart(): React.JSX.Element {
         setError(null);
         const cartData = await getCart();
         
-        // Fetch product details for each cart item
         const itemsWithProducts = await Promise.all(
           cartData.map(async (item: CartItem) => {
             try {
@@ -75,7 +74,6 @@ function Cart(): React.JSX.Element {
   const handleQuantityChange = async (itemId: number, newQuantity: number): Promise<void> => {
     try {
       await updateCartItem(itemId, newQuantity);
-      // Update local state
       setCartItems(cartItems.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       ));
@@ -119,40 +117,16 @@ function Cart(): React.JSX.Element {
       return;
     }
     
-    const subtotal = calculateSubtotal();
     const total = calculateTotal();
     const itemCount = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
     
-    // Show checkout notification
     await notifyCheckout(total, itemCount);
     
-    // Proceed with checkout (you can add actual checkout logic here)
     alert(t('cart.checkoutAlert', { count: itemCount, plural: itemCount > 1 ? 's' : '', total: total.toFixed(2) }));
   };
 
   if (authLoading || loading) {
-    return <Spinner />;
-  }
-
-  if (!user) {
-    return (
-      <div className="container my-5">
-        <div className="row">
-          <div className="col text-center py-5">
-            <h2>{t('cart.loginTitle')}</h2>
-            <p className="text-muted mb-4">{t('cart.loginSubtitle')}</p>
-            <div className="d-flex gap-2 justify-content-center">
-              <button className="btn btn-primary" onClick={() => navigate('/login')}>
-                {t('cart.login')}
-              </button>
-              <button className="btn btn-outline-primary" onClick={() => navigate('/signup')}>
-                {t('cart.signup')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <div className="d-flex mt-5 justify-content-center align-items-center"><Spinner /></div>;
   }
 
   if (cartItems.length === 0) {
@@ -162,7 +136,8 @@ function Cart(): React.JSX.Element {
           <div className="col text-center py-5">
             <h2>{t('cart.emptyTitle')}</h2>
             <p className="text-muted mb-4">{t('cart.emptySubtitle')}</p>
-            <button className="btn btn-primary" onClick={() => navigate('/products')}>
+            <button className="btn btn-primary" onClick={() => navigate('/products')}
+              style={{ backgroundColor: "#2A3A47", color: "#FFFFFF", border: 0 }}>
               {t('cart.browse')}
             </button>
           </div>
@@ -214,6 +189,8 @@ function Cart(): React.JSX.Element {
               <button
                 className="btn btn-primary btn-lg w-100"
                 onClick={handleCheckout}
+                style={{backgroundColor: "#5D8A6A", border: 0}}
+                
               >
                 {t('cart.checkout')}
               </button>

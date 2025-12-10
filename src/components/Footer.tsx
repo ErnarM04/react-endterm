@@ -6,7 +6,7 @@ function Footer() {
   const { t, i18n } = useTranslation();
 
   return (
-    <footer className="bg-dark text-light py-3 mt-auto w-100 border-top">
+    <footer className="text-light py-3 mt-auto w-100 border-top" style={{ backgroundColor: "#2A3A47" }}>
       <Container className="d-flex justify-content-between align-items-center">
         <span className="fw-bold">{t("brand")}</span>
         <Form.Select

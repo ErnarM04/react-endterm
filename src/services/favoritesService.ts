@@ -1,6 +1,3 @@
-import { Product } from './ItemsService';
-import { auth } from './firebase';
-
 const API_BASE_URL = "https://fastapi-endterm.onrender.com/favorites";
 const LOCAL_STORAGE_KEY = 'favorites';
 
@@ -11,14 +8,12 @@ export interface FavoriteItem {
   added_at?: string;
 }
 
-// Get headers for API requests
 function getHeaders(): HeadersInit {
   return {
     'Content-Type': 'application/json',
   };
 }
 
-// LocalStorage functions for guests
 function getLocalStorageFavorites(): number[] {
   try {
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -50,26 +45,20 @@ function removeFromLocalStorageFavorites(productId: number): void {
   setLocalStorageFavorites(filtered);
 }
 
-// API functions for logged-in users
 async function getAPIFavorites(userId: string): Promise<FavoriteItem[]> {
   try {
-    const url = `${API_BASE_URL}/${userId}`;
-    console.log(userId);
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}/${userId}`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Favorites API error (${response.status}):`, errorText);
+      console.error(`Favorites API error (${response.status}):`, await response.text());
       throw new Error(`Failed to fetch favorites: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Favorites API response:', data);
     
-    // Handle both array response and object with items property
     let favorites: any[] = [];
     if (Array.isArray(data)) {
       favorites = data;
@@ -78,14 +67,10 @@ async function getAPIFavorites(userId: string): Promise<FavoriteItem[]> {
     } else if (data.favorites && Array.isArray(data.favorites)) {
       favorites = data.favorites;
     } else if (data && typeof data === 'object') {
-      // If it's a single object, wrap it in an array
       favorites = [data];
     }
     
-    // Normalize the response to ensure product_id exists
-    // The API might return different field names
     const normalized = favorites.map((item: any) => {
-      // Handle different possible field names
       const productId = item.product_id || item.productId || item.id;
       return {
         id: item.id,
@@ -95,7 +80,6 @@ async function getAPIFavorites(userId: string): Promise<FavoriteItem[]> {
       };
     }).filter((item: any) => item.product_id !== undefined && item.product_id !== null);
     
-    console.log('Normalized favorites:', normalized);
     return normalized;
   } catch (error) {
     console.error('Error fetching favorites from API:', error);
@@ -152,18 +136,15 @@ export async function syncLocalStorageToAPI(userId: string): Promise<void> {
     const localFavorites = getLocalStorageFavorites();
     if (localFavorites.length === 0) return;
 
-    // Get current API favorites to avoid duplicates
     const apiFavorites = await getAPIFavorites(userId);
     const apiProductIds = new Set(apiFavorites.map((fav) => fav.product_id));
 
-    // Add all local favorites to API (skip if already exists)
     const promises = localFavorites
       .filter((productId) => !apiProductIds.has(productId))
       .map((productId) => addToAPIFavorites(userId, productId));
     
     await Promise.all(promises);
 
-    // Clear localStorage after sync
     localStorage.removeItem(LOCAL_STORAGE_KEY);
   } catch (error) {
     console.error('Error syncing favorites to API:', error);
@@ -171,7 +152,6 @@ export async function syncLocalStorageToAPI(userId: string): Promise<void> {
   }
 }
 
-// Public API functions
 export async function getFavorites(userId: string | null): Promise<FavoriteItem[]> {
   if (userId) {
     return await getAPIFavorites(userId);

@@ -1,11 +1,3 @@
-/**
- * Compresses an image file and returns it as a base64 string
- * @param file - The image file to compress
- * @param maxWidth - Maximum width (default: 400)
- * @param maxHeight - Maximum height (default: 400)
- * @param quality - JPEG quality 0-1 (default: 0.8)
- * @returns Promise<string> - Base64 data URL
- */
 export function compressImage(
   file: File,
   maxWidth: number = 400,
@@ -19,7 +11,6 @@ export function compressImage(
       const img = new Image();
       
       img.onload = () => {
-        // Calculate new dimensions
         let width = img.width;
         let height = img.height;
         
@@ -35,7 +26,6 @@ export function compressImage(
           }
         }
         
-        // Create canvas and compress
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
@@ -48,7 +38,6 @@ export function compressImage(
         
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Convert to base64
         const base64 = canvas.toDataURL('image/jpeg', quality);
         resolve(base64);
       };

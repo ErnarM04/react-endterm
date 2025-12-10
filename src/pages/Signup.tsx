@@ -22,8 +22,7 @@ function Signup() {
                 setLoading(true);
                 setError("");
                 createUserWithEmailAndPassword(auth, email, password)
-                    .then(userCredential => {
-                        console.log(userCredential);
+                    .then(() => {
                         navigate("/profile");
                     })
                     .catch(error => setError(error.toString()))
@@ -73,7 +72,6 @@ function Signup() {
                     }
                 }
                 else setError(t('signup.errors.invalidEmail'));
-                console.log(email, password);
             }}>
                 <h3 className="card-title m-4">{t('signup.title')}</h3>
                 <div className="card-body">

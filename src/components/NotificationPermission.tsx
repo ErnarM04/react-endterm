@@ -28,7 +28,7 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
       setPermission(newPermission);
       
       if (newPermission === 'granted') {
-        // Show a test notification
+
         if ('serviceWorker' in navigator) {
           const registration = await navigator.serviceWorker.ready;
           await registration.showNotification(t('notifications.toast.enabledTitle'), {
@@ -46,7 +46,7 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
   };
 
   if (!isSupported) {
-    return null; // Don't show anything if notifications aren't supported
+    return null;
   }
 
   if (permission === 'granted') {

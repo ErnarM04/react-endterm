@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {Navigate, useNavigate} from "react-router";
 import {useAuth} from "../services/AuthContext";
 import {signOut} from "firebase/auth";
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../services/store';
-import { fetchProfile, uploadProfilePicture, removeProfilePicture } from '../features/profile/profileSlice';
+import { getUserProfile, saveProfilePicture } from "../services/profileService";
 import { compressImage } from "../utils/imageCompression";
 import ErrorBox from "../components/ErrorBox";
 import Spinner from "../components/Spinner";
@@ -14,17 +12,30 @@ import { useTranslation } from "react-i18next";
 function Profile() {
     const { user, auth } = useAuth();
     const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
-    const { photoURL, loading, uploading, error } = useSelector((state: RootState) => state.profile);
+    const [photoURL, setPhotoURL] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { t } = useTranslation();
 
     useEffect(() => {
         if (user) {
-            dispatch(fetchProfile(user.uid));
+            setLoading(true);
+            getUserProfile(user.uid)
+                .then((profile) => {
+                    setPhotoURL(profile?.photoURL || null);
+                    setError(null);
+                })
+                .catch((err) => {
+                    setError(err.message);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         }
-    }, [user, dispatch]);
+    }, [user]);
 
     if (!user) {
         return <Navigate to="/login" replace/>
@@ -52,22 +63,34 @@ function Profile() {
             // Compress image
             const compressedBase64 = await compressImage(file, 400, 400, 0.8);
 
-            // Save to Firestore via Redux
-            dispatch(uploadProfilePicture({ userId: user.uid, photoBase64: compressedBase64 }));
+            // Save to Firestore
+            setUploading(true);
+            await saveProfilePicture(user.uid, compressedBase64);
+            setPhotoURL(compressedBase64);
+            setError(null);
         } catch (err) {
             console.error('Error compressing image:', err);
             setValidationError(t('profile.validation.processFailed'));
         } finally {
-            // Reset file input
+            setUploading(false);
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
         }
     };
 
-    const handleRemovePicture = () => {
+    const handleRemovePicture = async () => {
         if (user) {
-            dispatch(removeProfilePicture(user.uid));
+            try {
+                setUploading(true);
+                await saveProfilePicture(user.uid, '');
+                setPhotoURL(null);
+                setError(null);
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setUploading(false);
+            }
         }
     };
 
@@ -92,13 +115,13 @@ function Profile() {
             className="d-flex align-items-center justify-content-center"
             style={{ width: "100%", minHeight: "90vh" }}
         >
-            <div className="card shadow border-0 p-4" style={{ width: "100%", maxWidth: "500px" }}>
+            <div className="card shadow border-0 p-4" style={{ width: "100%", maxWidth: "800px" }}>
                 <h3 className="card-title mb-4">{t('profile.title')}</h3>
 
                 {(error || validationError) && <ErrorBox message={error || validationError || ''} />}
 
-                {/* Profile Picture Section */}
-                <div className="text-center mb-4">
+                <div className="d-flex flex-column flex-md-row gap-4">
+                    <div className="d-flex flex-column align-items-center">
                     <div className="position-relative d-inline-block">
                         {photoURL ? (
                             <img
@@ -135,7 +158,7 @@ function Profile() {
                             </div>
                         )}
                     </div>
-                    <div className="mt-3">
+                        <div className="mt-3 d-flex flex-column align-items-center">
                         <input
                             ref={fileInputRef}
                             type="file"
@@ -144,7 +167,7 @@ function Profile() {
                             style={{ display: 'none' }}
                             id="profile-picture-input"
                         />
-                        <label htmlFor="profile-picture-input" className="btn btn-primary btn-sm me-2">
+                            <label htmlFor="profile-picture-input" className="btn btn-primary btn-sm mb-2">
                             {photoURL ? t('profile.changePhoto') : t('profile.uploadPhoto')}
                         </label>
                         {photoURL && (
@@ -159,6 +182,7 @@ function Profile() {
                     </div>
                 </div>
 
+                    <div className="flex-grow-1">
                 <div className="mb-3">
                     <h5 className="text-muted mb-1">{t('profile.email')}</h5>
                     <div className="bg-light border-0 p-2 rounded">
@@ -180,11 +204,13 @@ function Profile() {
 
                 <button 
                     onClick={handleLogout}
-                    className="btn btn-danger m-auto w-50"
+                            className="btn btn-danger"
                     disabled={uploading}
                 >
                     {t('profile.logout')}
                 </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

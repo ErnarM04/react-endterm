@@ -8,14 +8,7 @@ import { RootState, AppDispatch } from '../services/store';
 import { addFavorite, removeFavorite, checkFavoriteStatus } from '../features/favorites/favoritesSlice';
 import { ImageSkeleton } from '../components/Spinner';
 import { useTranslation } from "react-i18next";
-
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    description: string;
-    thumbnail: string;
-}
+import { Product } from "../services/ItemsService";
 
 interface ProductCardProps {
     product: Product;
@@ -29,7 +22,10 @@ function ProductCard({ product }: ProductCardProps) {
     const [isInView, setIsInView] = useState(false);
     const [hasError, setHasError] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isRu = i18n.language?.startsWith("ru");
+    const displayName = isRu && product.name_ru ? product.name_ru : product.name;
+    const displayDescription = isRu && product.description_ru ? product.description_ru : product.description;
 
     useEffect(() => {
         dispatch(checkFavoriteStatus({ userId: user?.uid || null, productId: product.id }));
@@ -90,14 +86,14 @@ function ProductCard({ product }: ProductCardProps) {
     };
 
     return (
-        <div className='card position-relative'>
+        <div className='card item position-relative'>
             <button
-                className="btn btn-sm position-absolute"
+                className="btn btn-sm position-absolute favorite-button"
                 style={{ top: '10px', right: '10px', zIndex: 10, backgroundColor: 'rgba(255,255,255,0.8)' }}
                 onClick={handleFavoriteToggle}
                 title={isFavorite ? t('products.removeFavorite') : t('products.addFavorite')}
             >
-                {isFavorite ? '❤️' : '🤍'}
+                {isFavorite ? '❤️' : '🖤'}
             </button>
             <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div ref={imgRef} style={{ position: 'relative', minHeight: '200px', overflow: 'hidden' }}>
@@ -110,7 +106,7 @@ function ProductCard({ product }: ProductCardProps) {
                         <img 
                             className="card-img-top" 
                             src={product.thumbnail} 
-                            alt={product.name}
+                            alt={displayName}
                             onLoad={handleLoad}
                             onError={handleError}
                             style={{
@@ -134,10 +130,10 @@ function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
                 <div className="card-body">
-                    <h3 className='fw-bold' >{product.name}</h3>
+                    <h3 className='fw-bold' >{displayName}</h3>
                     <h5>{product.price}$</h5>
                     <p className='text'>
-                        {product.description}
+                        {displayDescription}
                     </p>
                 </div>
             </Link>
