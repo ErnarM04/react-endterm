@@ -34,7 +34,6 @@ function ProductCard({ product }: ProductCardProps) {
     useEffect(() => {
         if (!imgRef.current || isInView) return;
 
-        // Check if element is already in view
         const rect = imgRef.current.getBoundingClientRect();
         const isVisible = rect.top < window.innerHeight + 50 && rect.bottom > -50;
         

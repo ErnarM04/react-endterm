@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Profile from './Profile';
 import { BrowserRouter } from 'react-router';
+import { getUserProfile } from '../services/profileService';
 
 jest.mock('../i18n', () => ({
   __esModule: true,
@@ -34,22 +35,28 @@ jest.mock('firebase/auth', () => ({
   signOut: jest.fn(() => Promise.resolve()),
 }));
 
-// Mock react-router hooks
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   Navigate: ({ to }: { to: string }) => <div data-testid="navigate">{to}</div>,
   useNavigate: () => jest.fn(),
 }));
 
-// Mock imageCompression
 jest.mock('../utils/imageCompression', () => ({
   compressImage: jest.fn(() => Promise.resolve('compressed-image-data')),
 }));
 
-// Mock profileService - using manual mock from __mocks__
-jest.mock('../services/profileService');
+jest.mock('../services/profileService', () => ({
+  __esModule: true,
+  getUserProfile: jest.fn(),
+  saveProfilePicture: jest.fn(() => Promise.resolve()),
+  getProfilePicture: jest.fn(() => Promise.resolve(null)),
+}));
 
 describe('Profile', () => {
+  beforeEach(() => {
+    (getUserProfile as jest.Mock).mockResolvedValue({ photoURL: null });
+  });
+
   it('renders profile page', async () => {
     const { container } = render(
       <BrowserRouter>

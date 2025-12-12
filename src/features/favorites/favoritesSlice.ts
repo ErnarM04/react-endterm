@@ -3,7 +3,6 @@ import { getFavorites, addToFavorites, removeFromFavorites, checkIsFavorite, Fav
 import { Product } from "../../services/ItemsService";
 import { getProductById } from "../../services/ItemsService";
 
-// Async thunks
 export const fetchFavorites = createAsyncThunk(
   'favorites/fetchFavorites',
   async (userId: string | null, thunkAPI) => {
@@ -11,7 +10,6 @@ export const fetchFavorites = createAsyncThunk(
       const favoriteItems = await getFavorites(userId);
       console.log('Fetched favorite items:', favoriteItems);
       
-      // Filter out items without product_id and fetch product details
       const validFavorites = favoriteItems.filter((item) => {
         if (!item || item.product_id === undefined || item.product_id === null) {
           console.warn('Invalid favorite item (missing product_id):', item);

@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Footer from './Footer';
 
-// Mock react-i18next
 const mockChangeLanguage = jest.fn();
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({

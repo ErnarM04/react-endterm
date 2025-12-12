@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -11,42 +11,19 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Favorites from "./pages/Favorites";
+import Offline from "./pages/Offline";
 import {AuthProvider} from "./services/AuthContext";
-import ErrorBox from './components/ErrorBox';
-import { useTranslation } from 'react-i18next';
+import OfflineBanner from './components/OfflineBanner';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 
 function App() {
-
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
-    const { t } = useTranslation();
-
-    useEffect(() => {
-        const handleOnline = () => {
-            setIsOnline(true);
-            console.log('Back online');
-        };
-
-        const handleOffline = () => {
-            setIsOnline(false);
-            console.log('Gone offline');
-        };
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
-    }, []);
+    const { isOnline } = useOnlineStatus();
 
     return (
         <AuthProvider>
             <BrowserRouter>
                 <div className="d-flex flex-column min-vh-100">
-                    {!isOnline && (
-                        <ErrorBox message={t('offline')} style={{ position: 'sticky', top: 0, zIndex: 1050 }}/>
-                    )}
+                    {!isOnline && <OfflineBanner />}
                     <Header />
                     <main className="flex-fill" style={{ backgroundColor: "#F5F6F7" }}>
                         <Routes>
@@ -58,6 +35,7 @@ function App() {
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/cart" element={<Cart />} />
                             <Route path="/favorites" element={<Favorites />} />
+                            <Route path="/offline" element={<Offline />} />
                         </Routes>
                     </main>
                     <Footer />

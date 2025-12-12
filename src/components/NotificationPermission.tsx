@@ -90,7 +90,6 @@ function NotificationPermission({ showAsBanner = false }: NotificationPermission
     );
   }
 
-  // Permission is 'default' - show request button
   if (showAsBanner) {
     return (
       <div className="alert alert-info d-flex align-items-center justify-content-between mb-3" role="alert">

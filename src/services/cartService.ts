@@ -1,114 +1,158 @@
-import { CartItem } from '../types';
-import { auth } from './firebase';
+import { CartItem } from "../types";
 
 const API_URL = "https://fastapi-endterm.onrender.com/carts";
-const CART_ID_KEY = 'cart_id';
 
-const getHeaders = (): HeadersInit => {
-  return {
-    'Content-Type': 'application/json',
-  };
+// ---------- Helpers ----------
+const getHeaders = (): HeadersInit => ({
+  "Content-Type": "application/json",
+});
+
+const assertUser = (userId?: string): string => {
+  if (!userId) {
+    throw new Error("You must be logged in to use the cart.");
+  }
+  return userId;
 };
 
-function requireAuth(): void {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error('You must be logged in to use the cart. Please log in first.');
+// ---------- Create Cart for userId endpoint ----------
+async function createCartForUser(userId: string): Promise<void> {
+  const uid = assertUser(userId);
+  const response = await fetch(`${API_URL}/${uid}`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ user_id: uid }),
+  });
+  if (!response.ok && response.status !== 409) {
+    throw new Error("Could not create cart");
   }
 }
 
-async function getOrCreateCartId(): Promise<number> {
-  requireAuth();
-  const storedCartId = localStorage.getItem(CART_ID_KEY);
-  if (storedCartId) {
-    const cartId = parseInt(storedCartId, 10);
-    try {
-      const response = await fetch(`${API_URL}/${cartId}`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-      if (response.ok) {
-        return cartId;
-      }
-    } catch {
-    }
-  }
+// ---------- Get Cart ----------
+export async function getCart(userId?: string): Promise<CartItem[]> {
+  const uid = assertUser(userId);
 
-  const response = await fetch(API_URL, {
-    method: 'POST',
+  let response = await fetch(`${API_URL}/${uid}`, {
+    method: "GET",
     headers: getHeaders(),
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to create cart: ${response.statusText}`);
+  if (response.status === 404) {
+    await createCartForUser(uid);
+    return [];
   }
 
-  const cart = await response.json();
-  const cartId = cart.id;
-  localStorage.setItem(CART_ID_KEY, cartId.toString());
-  return cartId;
-}
-
-export async function getCart(): Promise<CartItem[]> {
-  requireAuth();
-  const cartId = await getOrCreateCartId();
-  const response = await fetch(`${API_URL}/${cartId}`, {
-    method: 'GET',
-    headers: getHeaders(),
-  });
-
   if (!response.ok) {
-    throw new Error(`Failed to fetch cart: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch cart: ${response.status} ${errorText}`);
   }
 
-  const cart = await response.json();
-  const items = (cart.items || []).map((item: any, index: number) => ({
-    ...item,
-    id: item.id || item.product_id || index,
+  const data = await response.json();
+
+  // Handle different response structures
+  const items = data.items || data || [];
+  
+  return items.map((item: any, index: number) => ({
+    id: item.id ?? item.cart_item_id ?? item.product_id ?? index,
+    product_id: item.product_id,
+    quantity: item.quantity ?? 1,
+    price: item.price ?? 0,
   }));
-  return items;
 }
 
-export async function addToCart(productId: number, quantity: number = 1): Promise<CartItem> {
-  requireAuth();
-  const cartId = await getOrCreateCartId();
-  const response = await fetch(`${API_URL}/${cartId}/items`, {
-    method: 'POST',
+// ---------- Add Item ----------
+export async function addToCart(
+  userId: string | undefined,
+  productId: number,
+  quantity: number = 1
+): Promise<CartItem> {
+  const uid = assertUser(userId);
+
+  let response = await fetch(`${API_URL}/${uid}/items`, {
+    method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ product_id: productId, quantity }),
   });
 
+  if (response.status === 404) {
+    await createCartForUser(uid);
+    response = await fetch(`${API_URL}/${uid}/items`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ product_id: productId, quantity }),
+    });
+  }
+
   if (!response.ok) {
-    throw new Error(`Failed to add item to cart: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Failed to add item to cart: ${response.status} ${errorText}`);
   }
 
-  return response.json();
+  const item = await response.json();
+
+  // Handle different response structures
+  return {
+    id: item.id ?? item.cart_item_id ?? item.product_id ?? productId,
+    product_id: item.product_id ?? productId,
+    quantity: item.quantity ?? quantity,
+    price: item.price ?? 0,
+  };
 }
 
-export async function updateCartItem(itemId: number, quantity: number): Promise<CartItem> {
-  requireAuth();
-  const cart = await getCart();
-  const item = cart.find((i: CartItem) => i.id === itemId);
-  
+// ---------- Update Item ----------
+export async function updateCartItem(
+  userId: string | undefined,
+  itemId: number,
+  quantity: number
+): Promise<CartItem> {
+  const uid = assertUser(userId);
+
+  const cart = await getCart(uid);
+  const item = cart.find((i) => i.id === itemId);
   if (!item) {
-    throw new Error('Cart item not found');
+    throw new Error("Cart item not found");
   }
 
-  await removeCartItem(item.product_id);
-  
-  return addToCart(item.product_id, quantity);
+  let response = await fetch(`${API_URL}/${uid}/items/${item.product_id}`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify({ quantity }),
+  });
+
+  if (response.status === 404) {
+    await createCartForUser(uid);
+    response = await fetch(`${API_URL}/${uid}/items/${item.product_id}`, {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify({ quantity }),
+    });
+  }
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update cart item: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+
+  return {
+    id: data.id ?? data.cart_item_id ?? data.product_id ?? itemId,
+    product_id: data.product_id ?? item.product_id,
+    quantity: data.quantity ?? quantity,
+    price: data.price ?? item.price ?? 0,
+  };
 }
 
-export async function removeCartItem(productId: number): Promise<void> {
-  requireAuth();
-  const cartId = await getOrCreateCartId();
-  const response = await fetch(`${API_URL}/${cartId}/items/${productId}`, {
-    method: 'DELETE',
+// ---------- Remove Item ----------
+export async function removeCartItem(userId: string | undefined, productId: number): Promise<void> {
+  const uid = assertUser(userId);
+
+  const response = await fetch(`${API_URL}/${uid}/items/${productId}`, {
+    method: "DELETE",
     headers: getHeaders(),
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to remove cart item: ${response.statusText}`);
+  if (!response.ok && response.status !== 404) {
+    const errorText = await response.text();
+    throw new Error(`Failed to remove cart item: ${response.status} ${errorText}`);
   }
 }
-

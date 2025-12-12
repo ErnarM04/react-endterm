@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
-// Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, params?: any) => {
@@ -17,19 +16,16 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-// Mock ProductCard
 jest.mock('./ProductCard', () => {
   return function MockProductCard({ product }: { product: any }) {
     return <div data-testid="product-card">{product.name}</div>;
   };
 });
 
-// Mock useDebounce hook
 jest.mock('../hooks/useDebounce', () => ({
   useDebounce: (value: string) => value,
 }));
 
-// Create a test store
 const createTestStore = () => {
   return configureStore({
     reducer: {

@@ -15,11 +15,9 @@ function ProductsList() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t } = useTranslation();
 
-    // LOCAL STATE for INPUT
     const initialQuery = searchParams.get("q") || "";
     const [localQuery, setLocalQuery] = useState(initialQuery);
 
-    // DEBOUNCED INPUT VALUE
     const debouncedQuery = useDebounce(localQuery, 400);
 
     const initialPage = parseInt(searchParams.get("page") || "1", 10);
@@ -34,19 +32,16 @@ function ProductsList() {
         limit
     } = useSelector((state: RootState) => state.items);
 
-    // Sync initial params → store
     useEffect(() => {
         dispatch(setQuery(initialQuery));
         dispatch(setPage(initialPage));
     }, []);
 
-    // When DEBOUNCED query changes → update Redux query and reset page
     useEffect(() => {
         dispatch(setQuery(debouncedQuery));
         dispatch(setPage(1));
     }, [debouncedQuery]);
 
-    // Fetch when Redux query or page changes
     useEffect(() => {
         const params: Record<string, string> = {};
         if (query) params.q = query;
@@ -104,7 +99,6 @@ function ProductsList() {
                         ))}
                     </div>
 
-                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="d-flex justify-content-center align-items-center mt-4 mb-4">
                             <nav aria-label="Page navigation">

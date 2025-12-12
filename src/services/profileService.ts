@@ -7,11 +7,6 @@ export interface UserProfile {
   updatedAt: string;
 }
 
-/**
- * Save profile picture to Firestore
- * @param userId - User ID
- * @param photoBase64 - Compressed image as base64 string
- */
 export async function saveProfilePicture(userId: string, photoBase64: string): Promise<void> {
   try {
     const userRef = doc(db, 'users', userId);
@@ -29,11 +24,7 @@ export async function saveProfilePicture(userId: string, photoBase64: string): P
   }
 }
 
-/**
- * Get user profile from Firestore
- * @param userId - User ID
- * @returns UserProfile or null
- */
+
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const userRef = doc(db, 'users', userId);
@@ -49,11 +40,6 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   }
 }
 
-/**
- * Get profile picture URL from Firestore
- * @param userId - User ID
- * @returns Base64 data URL or null
- */
 export async function getProfilePicture(userId: string): Promise<string | null> {
   try {
     const profile = await getUserProfile(userId);

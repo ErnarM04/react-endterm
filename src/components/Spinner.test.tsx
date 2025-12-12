@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import LoadingSpinner, { ImageSkeleton } from './Spinner';
 
-// Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,

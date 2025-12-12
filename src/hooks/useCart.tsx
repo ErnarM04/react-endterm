@@ -19,7 +19,7 @@ export function useCart() {
     try {
       setLoading(true);
       setError(null);
-      const cartData = await getCart();
+      const cartData = await getCart(user.uid);
       setItems(cartData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to load cart";
@@ -38,13 +38,21 @@ export function useCart() {
     }
     try {
       setError(null);
-      const newItem = await addToCart(productId, quantity);
-      setItems((prev) => [...prev, newItem]);
+      const newItem = await addToCart(user.uid, productId, quantity);
       
-      if (productName) {
-        await notifyItemAddedToCart(productName);
-      } else {
-        await notifyItemAddedToCart(`Product #${productId}`);
+      // Refresh cart from server to ensure consistency
+      await fetchCart();
+      
+      // Show notification
+      try {
+        if (productName) {
+          await notifyItemAddedToCart(productName);
+        } else {
+          await notifyItemAddedToCart(`Product #${productId}`);
+        }
+      } catch (notifError) {
+        // Don't fail the add operation if notification fails
+        console.warn('Failed to show notification:', notifError);
       }
       
       return newItem;
@@ -53,12 +61,12 @@ export function useCart() {
       setError(errorMessage);
       throw err;
     }
-  }, [user]);
+  }, [user, fetchCart]);
 
   const updateItem = useCallback(async (itemId: number, quantity: number) => {
     try {
       setError(null);
-      const updatedItem = await updateCartItem(itemId, quantity);
+      const updatedItem = await updateCartItem(user?.uid, itemId, quantity);
       setItems((prev) =>
         prev.map((item) => (item.id === itemId ? updatedItem : item))
       );
@@ -77,7 +85,7 @@ export function useCart() {
       if (!item) {
         throw new Error('Item not found in cart');
       }
-      await removeCartItem(item.product_id);
+      await removeCartItem(user?.uid, item.product_id);
       setItems((prev) => prev.filter((item) => item.id !== itemId));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to remove item";

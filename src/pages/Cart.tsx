@@ -33,7 +33,7 @@ function Cart(): React.JSX.Element {
       try {
         setLoading(true);
         setError(null);
-        const cartData = await getCart();
+        const cartData = await getCart(user.uid);
         
         const itemsWithProducts = await Promise.all(
           cartData.map(async (item: CartItem) => {
@@ -73,7 +73,7 @@ function Cart(): React.JSX.Element {
 
   const handleQuantityChange = async (itemId: number, newQuantity: number): Promise<void> => {
     try {
-      await updateCartItem(itemId, newQuantity);
+      await updateCartItem(user?.uid, itemId, newQuantity);
       setCartItems(cartItems.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       ));
@@ -89,7 +89,7 @@ function Cart(): React.JSX.Element {
       if (!item) {
         throw new Error('Item not found in cart');
       }
-      await removeCartItem(item.product_id);
+      await removeCartItem(user?.uid, item.product_id);
       setCartItems(cartItems.filter(item => item.id !== itemId));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to remove item';

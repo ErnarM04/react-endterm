@@ -3,14 +3,12 @@ import { render, screen } from '@testing-library/react';
 import Cart from './Cart';
 import { BrowserRouter } from 'react-router';
 
-// Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
-// Mock AuthContext
 jest.mock('../services/AuthContext', () => ({
   useAuth: () => ({
     user: { uid: 'test-uid' },
@@ -18,14 +16,12 @@ jest.mock('../services/AuthContext', () => ({
   }),
 }));
 
-// Mock cartService
 jest.mock('../services/cartService', () => ({
   getCart: jest.fn(() => Promise.resolve([])),
   updateCartItem: jest.fn(() => Promise.resolve()),
   removeCartItem: jest.fn(() => Promise.resolve()),
 }));
 
-// Mock ItemsService
 jest.mock('../services/ItemsService', () => ({
   getProductById: jest.fn(() => Promise.resolve({
     id: 1,
@@ -36,19 +32,16 @@ jest.mock('../services/ItemsService', () => ({
   })),
 }));
 
-// Mock notificationService
 jest.mock('../services/notificationService', () => ({
   notifyCheckout: jest.fn(() => Promise.resolve()),
 }));
 
-// Mock CartCard
 jest.mock('../components/CartCard', () => {
   return function MockCartCard({ item }: { item: any }) {
     return <div data-testid="cart-card">{item.name}</div>;
   };
 });
 
-// Mock react-router hooks
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   useNavigate: () => jest.fn(),
@@ -61,7 +54,6 @@ describe('Cart', () => {
         <Cart />
       </BrowserRouter>
     );
-    // Component may show loading state initially, so just check it renders
     expect(document.body).toBeInTheDocument();
   });
 });

@@ -33,13 +33,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     useEffect(() => {
         return onAuthStateChanged(auth, async (currentUser) => {
-            // Sync favorites from localStorage to API when user logs in
             if (currentUser && currentUser.uid !== prevUserIdRef.current) {
                 try {
                     await syncLocalStorageToAPI(currentUser.uid);
-                    // Fetch favorites and cart after sync
                     dispatch(fetchFavorites(currentUser.uid));
-                    dispatch(fetchCart());
+                    dispatch(fetchCart(currentUser.uid));
                 } catch (error) {
                     console.error('Error syncing favorites on login:', error);
                 }
@@ -47,7 +45,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             }
             if (!currentUser) {
                 prevUserIdRef.current = null;
-                // Clear Redux state when user logs out
                 dispatch(clearFavorites());
                 dispatch(clearCart());
             }

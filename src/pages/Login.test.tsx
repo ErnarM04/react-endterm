@@ -17,7 +17,6 @@ jest.mock('firebase/auth', () => ({
   signInWithEmailAndPassword: jest.fn(() => Promise.resolve({})),
 }));
 
-// Mock react-router hooks
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   useNavigate: () => jest.fn(),

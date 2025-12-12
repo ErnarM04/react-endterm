@@ -130,7 +130,6 @@ async function checkIsFavoriteInAPI(userId: string, productId: number): Promise<
   }
 }
 
-// Sync localStorage to API on login
 export async function syncLocalStorageToAPI(userId: string): Promise<void> {
   try {
     const localFavorites = getLocalStorageFavorites();

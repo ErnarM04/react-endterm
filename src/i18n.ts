@@ -6,7 +6,33 @@ const resources = {
   en: {
     translation: {
       brand: 'FakeStore',
-      offline: 'You are offline. Showing cached data.',
+      offline: {
+        banner: {
+          message: 'You are offline. Some features may be limited.',
+          viewPage: 'View Offline Page'
+        },
+        page: {
+          title: 'You\'re Offline',
+          subtitle: 'No internet connection detected',
+          whatYouCanDo: 'What you can do offline:',
+          feature1: {
+            title: 'Browse Cached Products',
+            description: 'View previously loaded products and product details from cache.'
+          },
+          feature2: {
+            title: 'View Favorites',
+            description: 'Access your saved favorites that are stored locally.'
+          },
+          feature3: {
+            title: 'Review Cart',
+            description: 'Check your cart items. Changes will sync when you\'re back online.'
+          },
+          retry: 'Check Connection',
+          checking: 'Checking...',
+          goHome: 'Go to Home',
+          tip: 'Your data is safe and will sync automatically when connection is restored.'
+        }
+      },
       nav: {
         home: 'Home',
         products: 'Products',
@@ -176,7 +202,33 @@ const resources = {
   ru: {
     translation: {
       brand: 'FakeStore',
-      offline: 'Вы офлайн. Показываем кэшированные данные.',
+      offline: {
+        banner: {
+          message: 'Вы офлайн. Некоторые функции могут быть ограничены.',
+          viewPage: 'Открыть страницу офлайн'
+        },
+        page: {
+          title: 'Вы офлайн',
+          subtitle: 'Интернет-соединение не обнаружено',
+          whatYouCanDo: 'Что можно делать офлайн:',
+          feature1: {
+            title: 'Просмотр кэшированных товаров',
+            description: 'Просматривайте ранее загруженные товары и их детали из кэша.'
+          },
+          feature2: {
+            title: 'Просмотр избранного',
+            description: 'Доступ к сохранённым избранным товарам, хранящимся локально.'
+          },
+          feature3: {
+            title: 'Просмотр корзины',
+            description: 'Проверьте товары в корзине. Изменения синхронизируются при восстановлении соединения.'
+          },
+          retry: 'Проверить соединение',
+          checking: 'Проверка...',
+          goHome: 'На главную',
+          tip: 'Ваши данные в безопасности и автоматически синхронизируются при восстановлении соединения.'
+        }
+      },
       nav: {
         home: 'Главная',
         products: 'Товары',

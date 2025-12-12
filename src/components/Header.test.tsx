@@ -24,7 +24,6 @@ jest.mock('firebase/auth', () => ({
   auth: {},
 }));
 
-// Mock react-router hooks
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   useLocation: () => ({ pathname: '/' }),

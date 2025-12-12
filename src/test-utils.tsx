@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { AuthProvider } from './services/AuthContext';
 
-// Mock i18n
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -16,16 +15,13 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-// Create a test store
 export const createTestStore = () => {
   return configureStore({
     reducer: {
-      // Add your reducers here if needed
     },
   });
 };
 
-// Custom render function with providers
 export const renderWithProviders = (
   ui: React.ReactElement,
   {
@@ -48,7 +44,6 @@ export const renderWithProviders = (
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 };
 
-// Simple render with router only
 export const renderWithRouter = (ui: React.ReactElement) => {
   return render(<BrowserRouter>{ui}</BrowserRouter>);
 };

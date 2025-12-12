@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { CartItem } from "../../types";
 import { getCart, addToCart, updateCartItem, removeCartItem } from "../../services/cartService";
+import { notifyItemAddedToCart } from "../../services/notificationService";
 
 export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
-  async (_, thunkAPI) => {
+  async (userId: string | undefined, thunkAPI) => {
     try {
-      const cart = await getCart();
+      const cart = await getCart(userId);
       return cart;
     } catch (error) {
       return thunkAPI.rejectWithValue((error as Error).message);
@@ -16,9 +17,20 @@ export const fetchCart = createAsyncThunk(
 
 export const addItemToCart = createAsyncThunk(
   'cart/addItemToCart',
-  async ({ productId, quantity }: { productId: number; quantity: number }, thunkAPI) => {
+  async ({ userId, productId, quantity, productName }: { userId: string | undefined; productId: number; quantity: number; productName?: string }, thunkAPI) => {
     try {
-      const item = await addToCart(productId, quantity);
+      const item = await addToCart(userId, productId, quantity);
+      
+      // Show notification if product name is provided
+      if (productName) {
+        try {
+          await notifyItemAddedToCart(productName);
+        } catch (notifError) {
+          // Don't fail the add operation if notification fails
+          console.warn('Failed to show notification:', notifError);
+        }
+      }
+      
       return item;
     } catch (error) {
       return thunkAPI.rejectWithValue((error as Error).message);
@@ -28,9 +40,9 @@ export const addItemToCart = createAsyncThunk(
 
 export const updateItemQuantity = createAsyncThunk(
   'cart/updateItemQuantity',
-  async ({ itemId, quantity }: { itemId: number; quantity: number }, thunkAPI) => {
+  async ({ userId, itemId, quantity }: { userId: string | undefined; itemId: number; quantity: number }, thunkAPI) => {
     try {
-      const item = await updateCartItem(itemId, quantity);
+      const item = await updateCartItem(userId, itemId, quantity);
       return { itemId, item };
     } catch (error) {
       return thunkAPI.rejectWithValue((error as Error).message);
@@ -40,9 +52,9 @@ export const updateItemQuantity = createAsyncThunk(
 
 export const removeItemFromCart = createAsyncThunk(
   'cart/removeItemFromCart',
-  async (productId: number, thunkAPI) => {
+  async ({ userId, productId }: { userId: string | undefined; productId: number }, thunkAPI) => {
     try {
-      await removeCartItem(productId);
+      await removeCartItem(userId, productId);
       return productId;
     } catch (error) {
       return thunkAPI.rejectWithValue((error as Error).message);

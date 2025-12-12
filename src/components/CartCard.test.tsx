@@ -5,21 +5,18 @@ import { BrowserRouter } from 'react-router';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
-// Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
-// Mock AuthContext
 jest.mock('../services/AuthContext', () => ({
   useAuth: () => ({
     user: { uid: 'test-uid' },
   }),
 }));
 
-// Create a test store
 const createTestStore = () => {
   return configureStore({
     reducer: {
@@ -85,8 +82,6 @@ describe('CartCard', () => {
         onRemove={mockOnRemove}
       />
     );
-    // The price is split across text nodes: $ (node1) 10.99 (node2) space cartCard.each
-    // getByText with string requires exact match in single node, regex can match across nodes
     expect(screen.getByText(/10\.99/)).toBeInTheDocument();
   });
 

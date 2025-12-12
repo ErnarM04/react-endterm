@@ -47,23 +47,19 @@ function Profile() {
 
         setValidationError(null);
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             setValidationError(t('profile.validation.imageType'));
             return;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             setValidationError(t('profile.validation.imageSize'));
             return;
         }
 
         try {
-            // Compress image
             const compressedBase64 = await compressImage(file, 400, 400, 0.8);
 
-            // Save to Firestore
             setUploading(true);
             await saveProfilePicture(user.uid, compressedBase64);
             setPhotoURL(compressedBase64);
@@ -197,7 +193,6 @@ function Profile() {
                     </div>
                 </div>
 
-                {/* Notification Permission Section */}
                 <div className="mb-4">
                     <NotificationPermission />
                 </div>

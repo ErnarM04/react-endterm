@@ -271,7 +271,11 @@ export default function ItemDetails() {
                     <p><b>{t('products.rating')}:</b> {selectedItem.rating}</p>
                     
                     <div className="mt-4">
-                        {cartError && <ErrorBox message={cartError} />}
+                        {cartError && (
+                            <div className="mb-3">
+                                <ErrorBox message={cartError} />
+                            </div>
+                        )}
                         <button
                             className="btn btn-primary btn-lg"
                             style={{backgroundColor: "#5D8A6A", border: 0}}
@@ -285,6 +289,9 @@ export default function ItemDetails() {
                                     setAddingToCart(true);
                                     await addItem(selectedItem.id, 1, displayName);
                                 } catch (err) {
+                                    const errorMessage = err instanceof Error 
+                                        ? err.message 
+                                        : 'Failed to add item to cart. Please try again.';
                                     console.error('Failed to add to cart:', err);
                                 } finally {
                                     setAddingToCart(false);
